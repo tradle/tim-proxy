@@ -30,6 +30,7 @@ var server
 var port
 var defaultTarget
 var credentialsPath = conf.sslCredentialsPath
+var whyNoSSL = 'no sslCredentialsPath specified in conf'
 if (credentialsPath) {
   try {
     var privateKey = fs.readFileSync(path.join(credentialsPath, 'privkey.pem'))
@@ -39,12 +40,10 @@ if (credentialsPath) {
       cert: certificate
     }
   } catch (err) {
-    var reason = 'unable to read TLS certificate'
+    whyNoSSL = 'unable to read TLS certificate,'
     if (/permission denied/.test(err.message)) {
-      reason += ', permission denied,'
+      whyNoSSL += 'permission denied,'
     }
-
-    console.log(reason, ', running in HTTP mode')
   }
 }
 
@@ -52,7 +51,9 @@ if (credentials) {
   server = https.createServer(credentials, requestHandler)
   port = 443
   defaultTarget = 'http://localhost:80'
+  console.log('running in HTTPS mode')
 } else {
+  console.log(whyNoSSL, 'running in HTTP mode')
   server = http.createServer(requestHandler)
   port = 80
 }
