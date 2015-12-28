@@ -1,0 +1,17 @@
+{
+  "name": "tim-proxy",
+  "version": "1.0.0",
+  "description": "proxy for Tradle tim's various server components",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mark Vayngrib <mark.vayngrib@lablz.com> (http://github.com/mvayngrib)",
+  "license": "MIT",
+  "dependencies": {
+    "debug": "^2.2.0",
+    "http-proxy": "^1.12.0",
+    "http-proxy-rules": "^1.0.0"
+  }
+}
