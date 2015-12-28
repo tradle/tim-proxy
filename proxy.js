@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 var path = require('path')
+var fs = require('fs')
 var http = require('http')
 var https = require('https')
 var debug = require('debug')('proxy')
@@ -38,7 +39,12 @@ if (credentialsPath) {
       cert: certificate
     }
   } catch (err) {
-    console.log('unable to read TLS certificate, running in HTTP mode')
+    var reason = 'unable to read TLS certificate'
+    if (/permission denied/.test(err.message)) {
+      reason += ', permission denied,'
+    }
+
+    console.log(reason, ', running in HTTP mode')
   }
 }
 
