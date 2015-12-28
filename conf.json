@@ -1,0 +1,7 @@
+{
+  "rules": {
+    "^/keeper": "http://localhost:25667/",
+    "^/bank": "http://localhost:44444/"
+  },
+  "sslCredentialsPath": "/etc/letsencrypt/live/tradle.io/"
+}
