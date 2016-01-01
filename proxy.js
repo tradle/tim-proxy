@@ -2,6 +2,7 @@
 
 var path = require('path')
 var fs = require('fs')
+var parseUrl = require('url').parse
 var http = require('http')
 var https = require('https')
 var debug = require('debug')('proxy')
@@ -33,11 +34,11 @@ var credentialsPath = conf.sslCredentialsPath
 var whyNoSSL = 'no sslCredentialsPath specified in conf'
 if (credentialsPath) {
   try {
-    var privateKey = fs.readFileSync(path.join(credentialsPath, 'privkey.pem'))
-    var certificate = fs.readFileSync(path.join(credentialsPath, 'cert.pem'))
+    var privateKey = fs.readFileSync(path.join(credentialsPath, 'privkey.pem'), 'ascii')
+    var chain = fs.readFileSync(path.join(credentialsPath, 'fullchain.pem'), 'ascii')
     credentials = {
       key: privateKey,
-      cert: certificate
+      cert: chain
     }
   } catch (err) {
     whyNoSSL = 'unable to read TLS certificate,'
@@ -50,7 +51,7 @@ if (credentialsPath) {
 if (credentials) {
   server = https.createServer(credentials, requestHandler)
   port = 443
-  defaultTarget = 'http://localhost:80'
+//  defaultTarget = 'http://localhost:80'
   console.log('running in HTTPS mode')
 } else {
   console.log(whyNoSSL, 'running in HTTP mode')
@@ -61,10 +62,17 @@ if (credentials) {
 server.listen(port)
 
 function requestHandler (req, res) {
-  var target = proxyRules.match(req) || defaultTarget
+  var target = proxyRules.match(req)
   if (target) {
     return proxy.web(req, res, {
       target: target
+    })
+  } else if (credentials) {
+   // var parsed = parseUrl(req.url)
+    return proxy.web(req, res, {
+      xfwd: true,
+      target: 'http://tradle.io',
+      port: 80
     })
   }
 
